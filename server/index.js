@@ -1,26 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// Import Routes
+import authRoute from "./routes/auth.route.js";
+import bidRoute from "./routes/bid.route.js";
+import gigRoute from "./routes/gig.route.js";
 
-body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background-color: #f8fafc; /* Very light blue-grey, easier on eyes than pure white */
-  color: #1e293b; /* Soft black */
-}
+const app = express();
+dotenv.config();
+mongoose.set("strictQuery", true);
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+// Database Connection
+const connect = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connected to mongoDB!");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// Middleware
+const allowedOrigins = [process.env.CLIENT_URL, "http://localhost:5173", "http://localhost:5174"];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
+app.use(express.json());
+app.use(cookieParser());
+
+// Routes
+app.use("/api/auth", authRoute);
+app.use("/api/gigs", gigRoute);
+app.use("/api/bids", bidRoute);
+
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+  const errorStatus = err.status || 500;
+  const errorMessage = err.message || "Something went wrong!";
+  return res.status(errorStatus).send(errorMessage);
+});
+
+// Start Server
+app.listen(process.env.PORT || 5000, () => {
+  connect();
+  console.log("Backend server is running!");
+});
