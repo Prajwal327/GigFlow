@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import Gig from "./models/Gig.js";
-import User from "./models/temp_user.js";
+import User from "./models/User.js";
 
 dotenv.config();
 
