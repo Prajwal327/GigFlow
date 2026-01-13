@@ -39,28 +39,42 @@ export const login = async (req, res, next) => {
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) return res.status(400).json({ message: "Wrong Credentials!" });
 
-    // 3. Create Token (Using JWT_KEY to match your .env)
+    // ---------------------------------------------------------
+    // 🔍 DEBUGGING BLOCK (This will show up in Render Logs)
+    // ---------------------------------------------------------
+    console.log("--- DEBUGGING ENV VARS ---");
+    console.log("Checking JWT_KEY:", process.env.JWT_KEY ? "EXISTS" : "MISSING");
+    console.log("Checking JWT_SECRET:", process.env.JWT_SECRET ? "EXISTS" : "MISSING");
+    
+    // Fallback: Try JWT_KEY first, if missing, try JWT_SECRET
+    const secretKey = process.env.JWT_KEY || process.env.JWT_SECRET;
+    
+    if (!secretKey) {
+        throw new Error("FATAL ERROR: No JWT Secret found in Environment Variables!");
+    }
+    // ---------------------------------------------------------
+
+    // 3. Create Token
     const token = jwt.sign(
       { id: user._id, isSeller: user.isSeller }, 
-      process.env.JWT_KEY, 
+      secretKey, 
       { expiresIn: "1d" }
     );
 
     // 4. Send Cookie
-    // We separate the password from the rest of the user data
     const { password: userPassword, ...info } = user._doc;
 
     res
       .cookie("accessToken", token, {
         httpOnly: true,
-        secure: true, // ⚠️ REQUIRED for Vercel/Render (HTTPS)
-        sameSite: "none", // ⚠️ REQUIRED for Cross-Site cookies
+        secure: true,
+        sameSite: "none",
       })
       .status(200)
-      .send(info); // Now 'info' is defined above, so this will work!
+      .send(info);
       
   } catch (err) {
-    console.log("LOGIN ERROR:", err);
+    console.log("LOGIN ERROR:", err); // Log the full error
     next(err);
   }
 };
