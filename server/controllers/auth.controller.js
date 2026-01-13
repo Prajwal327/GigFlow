@@ -68,7 +68,7 @@ export const login = async (req, res, next) => {
   .status(200)
   .send(info);
   } catch (err) {
-    res.status(500).json({ message: "Something went wrong!" });
+    console.log("LOGIN ERROR DETAILS:", err); // <--- ADD THIS LINE
   }
 };
 
