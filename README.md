@@ -1,74 +1,116 @@
-# GigFlow - Freelance Marketplace (MERN Stack)
+# 🚀 GigFlow - Freelance Marketplace
 
-GigFlow is a full-stack platform connecting clients with freelancers. It features real-time bidding, automated hiring workflows, and live notifications.
+GigFlow is a full-stack MERN application connecting Clients with Freelancers. It features a complete bidding system, real-time notifications, and secure hiring workflows.
 
-## 🚀 Key Features
-- **Authentication:** Secure Login/Register with JWT & Cookies.
-- **Role-Based Access:** Clients can post jobs; Freelancers can bid.
-- **Advanced Hiring Logic:** - One-click hiring system.
-  - **Transactional Integrity:** Prevents race conditions (Double hiring) using MongoDB Sessions.
-  - **Auto-Rejection:** Automatically rejects other bids once a freelancer is hired.
-- **Real-Time Updates:** Socket.io integration for instant "You are Hired" notifications.
-- **Search & Filter:** Filter gigs by category, budget, and search queries.
+![Project Status](https://img.shields.io/badge/Status-Completed-success)
+![Tech Stack](https://img.shields.io/badge/Stack-MERN-blue)
 
-## 🛠️ Tech Stack
-- **Frontend:** React + Vite, Tailwind CSS, Socket.io Client.
-- **Backend:** Node.js, Express.js, Socket.io.
-- **Database:** MongoDB (Atlas) with Mongoose Transactions.
+## ✨ Key Features
 
-## 📦 Installation Guide
+### 🔹 Core Functionality
+- **Authentication:** Secure JWT-based Login/Register (HttpOnly Cookies).
+- **Dual Roles:** Users can act as Clients (Post Jobs) or Freelancers (Bid on Jobs).
+- **Gig Management:** Create, Edit, and Delete Gigs with rich text descriptions.
+- **Search & Filter:** Filter gigs by Category, Budget, and Search queries.
 
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-link>
-   cd GigFlow
-Setup Backend
-
-Bash
-
-cd server
-npm install
-# Create a .env file based on .env.example
-node seed.js # (Optional: Seeds dummy data)
-node index.js
-Setup Frontend
-
-# 2. Setup Backend
-
-cd client
-npm install
-npm run dev
-🧪 Credentials for Testing (Seed Data)
-Freelancer: bob@test.com / 123456
-
-Client: alice@test.com / 123456
-
+### 🏆 Advanced Features (Bonus Implemented)
+- **⚡ Real-Time Notifications (Socket.io):** When a Client hires a Freelancer, the Freelancer receives an instant "You are Hired" popup without refreshing the page.
+- **🔒 Transactional Integrity (Race Conditions):** Uses **MongoDB Sessions & Transactions** to ensure that if two admins try to hire different people for the same gig simultaneously, only one succeeds.
+- **🤖 Automated Workflow:** Hiring a freelancer automatically marks the Gig as "Assigned" and rejects all other pending bids.
 
 ---
 
-### **3. The Loom Video Script (2 Minutes)**
-The examiner might not run your code. The video is your proof that it works. Since you need to show the **Hiring Flow**, follow this script exactly.
+## 🛠️ Tech Stack
 
-**Setup before recording:**
-* Open **Chrome** (Client account - Alice).
-* Open **Incognito/Edge** (Freelancer account - Bob).
-* Split your screen so both are visible side-by-side.
+- **Frontend:** React + Vite, Tailwind CSS, Socket.io Client, React Hot Toast.
+- **Backend:** Node.js, Express.js, Socket.io.
+- **Database:** MongoDB Atlas (Mongoose).
+- **DevOps:** Ready for Render (Backend) & Vercel (Frontend).
 
-**Script:**
+---
 
-* **0:00 - 0:20 (Intro):** * "Hi, this is [Your Name]. This is GigFlow, a marketplace built with the MERN stack."
-    * "On the left, I have Alice (Client). On the right, I have Bob (Freelancer)."
+## ⚙️ Installation & Setup
 
-* **0:20 - 0:50 (Post & Bid):**
-    * "Alice posts a job called 'Fix my Website'." (Show Post Job form).
-    * "The job appears instantly on Bob's dashboard." (Refresh Bob's screen).
-    * "Bob places a bid of $500." (Submit Bid).
+Follow these steps to run the project locally.
 
-* **0:50 - 1:30 (The "Wow" Moment):**
-    * "Now for the advanced logic. Alice goes to her gig and sees Bob's bid."
-    * "When Alice clicks **Hire**, two things happen in the background: A MongoDB transaction ensures no one else is hired, and a Socket.io event fires."
-    * *(Click the button)*.
-    * "As you can see, Bob instantly received a green popup saying **'Congratulations'** without refreshing his page."
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/YourUsername/GigFlow.git](https://github.com/YourUsername/GigFlow.git)
+cd GigFlow
+```
 
-* **1:30 - 2:00 (Conclusion):**
-    * "The gig status is now 'Assigned'. If we check the database, all other bids were automatically rejected. This ensures data integrity. Thank you."
+### 2. Backend Setup
+```bash
+cd server
+npm install
+```
+
+**Create a `.env` file** in the `server` folder and add your credentials:
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_KEY=your_secret_key
+CLIENT_URL=http://localhost:5173
+```
+
+**Seed Database (Optional):**
+Populate the DB with dummy users and gigs:
+```bash
+node seed.js
+```
+
+**Start Server:**
+```bash
+node index.js
+```
+*(Server runs on port 5000)*
+
+### 3. Frontend Setup
+Open a new terminal:
+```bash
+cd client
+npm install
+npm run dev
+```
+*(Client runs on port 5173)*
+
+---
+
+## 🧪 Testing Credentials (from Seed Data)
+
+If you ran `node seed.js`, use these accounts to test the flow:
+
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **Client** | `alice@test.com` | `123456` |
+| **Freelancer** | `bob@test.com` | `123456` |
+
+---
+
+## 📸 Application Flow
+
+1. **Register/Login** as a Client.
+2. **Post a Gig** via the "Post Job" button.
+3. **Login** as a different user (Freelancer).
+4. **Place a Bid** on the gig.
+5. **Switch back to Client** and click "Hire" on the bid.
+6. **Watch** the Real-time notification appear on the Freelancer's screen!
+
+---
+
+## 📂 Project Structure
+
+```
+GigFlow/
+├── client/            # React Frontend
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   └── utils/
+├── server/            # Node.js Backend
+│   ├── controllers/   # Business Logic
+│   ├── models/        # Database Schemas
+│   ├── routes/        # API Endpoints
+│   └── index.js       # Entry Point
+└── README.md
+```
