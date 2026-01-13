@@ -4,35 +4,26 @@ import User from "../models/User.js";
 
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
-
     // 1. Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: req.body.email });
     if (existingUser) return res.status(400).json({ message: "User already exists!" });
 
     // 2. Hash the password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
     // 3. Create new user
     const newUser = new User({
-      name,
-      email,
+      ...req.body, // This automatically grabs name, email, isSeller, etc.
       password: hashedPassword,
     });
-    res
-  .cookie("accessToken", token, {
-    httpOnly: true,
-    secure: true, // ⚠️ REQUIRED for Vercel/Render (HTTPS)
-    sameSite: "none", // ⚠️ REQUIRED for Cross-Site cookies
-  })
-  .status(200)
-  .send(info);
 
+    // 4. Save to DB
     await newUser.save();
+    
     res.status(201).json({ message: "User created successfully!" });
   } catch (err) {
-    res.status(500).json({ message: "Something went wrong!" });
+    next(err);
   }
 };
 
@@ -48,27 +39,29 @@ export const login = async (req, res, next) => {
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) return res.status(400).json({ message: "Wrong Credentials!" });
 
-    // 3. Create Token
+    // 3. Create Token (Using JWT_KEY to match your .env)
     const token = jwt.sign(
-      { id: user._id }, 
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" } // Token expires in 1 day
+      { id: user._id, isSeller: user.isSeller }, 
+      process.env.JWT_KEY, 
+      { expiresIn: "1d" }
     );
 
-    // 4. Send Cookie [cite: 12]
-    // We send only necessary info (exclude password)
-    const { password: userPassword, ...otherDetails } = user._doc;
+    // 4. Send Cookie
+    // We separate the password from the rest of the user data
+    const { password: userPassword, ...info } = user._doc;
 
-   res
-  .cookie("accessToken", token, {
-    httpOnly: true,
-    secure: true, // ⚠️ REQUIRED for Vercel/Render (HTTPS)
-    sameSite: "none", // ⚠️ REQUIRED for Cross-Site cookies
-  })
-  .status(200)
-  .send(info);
+    res
+      .cookie("accessToken", token, {
+        httpOnly: true,
+        secure: true, // ⚠️ REQUIRED for Vercel/Render (HTTPS)
+        sameSite: "none", // ⚠️ REQUIRED for Cross-Site cookies
+      })
+      .status(200)
+      .send(info); // Now 'info' is defined above, so this will work!
+      
   } catch (err) {
-    console.log("LOGIN ERROR DETAILS:", err); // <--- ADD THIS LINE
+    console.log("LOGIN ERROR:", err);
+    next(err);
   }
 };
 
