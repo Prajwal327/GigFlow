@@ -27,8 +27,8 @@ const connect = async () => {
 const allowedOrigins = [process.env.CLIENT_URL, "http://localhost:5173", "http://localhost:5174"];
 
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
+  origin: [process.env.CLIENT_URL, "https://gigflow.vercel.app"], // Your specific Vercel URL
+  credentials: true // ⚠️ This allows the cookie to pass
 }));
 
 app.use(express.json());

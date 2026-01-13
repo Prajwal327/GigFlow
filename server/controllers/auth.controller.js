@@ -20,6 +20,14 @@ export const register = async (req, res, next) => {
       email,
       password: hashedPassword,
     });
+    res
+  .cookie("accessToken", token, {
+    httpOnly: true,
+    secure: true, // ⚠️ REQUIRED for Vercel/Render (HTTPS)
+    sameSite: "none", // ⚠️ REQUIRED for Cross-Site cookies
+  })
+  .status(200)
+  .send(info);
 
     await newUser.save();
     res.status(201).json({ message: "User created successfully!" });
@@ -51,14 +59,14 @@ export const login = async (req, res, next) => {
     // We send only necessary info (exclude password)
     const { password: userPassword, ...otherDetails } = user._doc;
 
-    res
-      .cookie("accessToken", token, {
-        httpOnly: true, // Crucial for security: prevents JS from reading the cookie
-        secure: false, // Set to 'true' if using HTTPS (production), 'false' for localhost
-        sameSite: "strict",
-      })
-      .status(200)
-      .json(otherDetails);
+   res
+  .cookie("accessToken", token, {
+    httpOnly: true,
+    secure: true, // ⚠️ REQUIRED for Vercel/Render (HTTPS)
+    sameSite: "none", // ⚠️ REQUIRED for Cross-Site cookies
+  })
+  .status(200)
+  .send(info);
   } catch (err) {
     res.status(500).json({ message: "Something went wrong!" });
   }
